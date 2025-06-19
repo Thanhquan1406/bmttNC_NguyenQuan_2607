@@ -10,14 +10,25 @@ def decode_image(encoded_image_path):
         for col in range(width):
             pixel = img.getpixel((col, row))
             for color_channel in range(3):
+                # Lấy bit cuối cùng của từng màu (LSB)
                 binary_message += format(pixel[color_channel], '08b')[-1]
                 
+    # Tìm vị trí dấu kết thúc '1111111111111110' (16 bit)
+    delimiter = '1111111111111110'
+    end_index = binary_message.find(delimiter)
+    if end_index == -1:
+        print("Không tìm thấy dấu kết thúc thông điệp!")
+        return ""
+
+    # Cắt đoạn bit chứa message
+    binary_message = binary_message[:end_index]
+
+    # Chuyển đổi từ bit sang chuỗi ký tự
     message = ""
     for i in range(0, len(binary_message), 8):
-        char = chr(int(binary_message[i:i+8], 2))
-        if char == '\0': # Kết thúc thông điệp khi gặp dấu '\0'
-            break
-        message += char
+        byte = binary_message[i:i+8]
+        message += chr(int(byte, 2))
+
     return message
 
 def main():
